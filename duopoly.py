@@ -15,10 +15,9 @@ def p(current_selling_season, information_dump_last_round=None, **feedback_data)
         tuple: (price (float), information_dump_response (str))
     """
     
-    # 1. DESERIALIZE STATE
-    if information_dump_last_round is None or information_dump_last_round == "":
-        # Cold start - initialize state
-        state = {
+    # Helper function to create default state
+    def create_default_state():
+        return {
             "season": 0,
             "competitor_prices": [],      # Ring buffer as list (bounded)
             "my_prices": [],             # Ring buffer as list (bounded) 
@@ -43,19 +42,22 @@ def p(current_selling_season, information_dump_last_round=None, **feedback_data)
             "competitor_trend": 0.0,     # Short-term trend signal
             "demand_trend": 0.0,         # Short-term demand trend
         }
+    
+    # 1. DESERIALIZE STATE
+    if information_dump_last_round is None or information_dump_last_round == "":
+        # Cold start - initialize state
+        state = create_default_state()
     else:
         try:
             state = json.loads(information_dump_last_round)
+            # Verify that all required keys exist
+            default_state = create_default_state()
+            for key in default_state:
+                if key not in state:
+                    state[key] = default_state[key]
         except (json.JSONDecodeError, TypeError):
             # Fallback to cold start on corrupted state
-            state = {
-                "season": 0,
-                "competitor_prices": [], "my_prices": [], "demands": [], "profit_history": [],
-                "demand_mean": 0.0, "demand_m2": 0.0, "demand_count": 0,
-                "competitor_mean": 0.0, "competitor_m2": 0.0, "competitor_count": 0,
-                "base_price": 10.0, "profit_momentum": 0.0, "price_volatility": 1.0,
-                "competitor_trend": 0.0, "demand_trend": 0.0
-            }
+            state = create_default_state()
     
     # 2. EXTRACT MARKET FEEDBACK
     competitor_price = feedback_data.get('competitor_price', None)
