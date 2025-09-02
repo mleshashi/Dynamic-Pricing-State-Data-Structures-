@@ -142,8 +142,8 @@ class TestDPCDuopoly(unittest.TestCase):
         """Test competitor and demand trend detection."""
         state_dump = None
         
-        # Create upward trend in competitor prices
-        upward_trend_prices = [8.0, 9.0, 10.0, 11.0, 12.0]
+        # Create upward trend in competitor prices with more pronounced changes
+        upward_trend_prices = [6.0, 8.0, 10.0, 12.0, 14.0]
         
         for i, comp_price in enumerate(upward_trend_prices):
             price, state_dump = p(
@@ -156,10 +156,11 @@ class TestDPCDuopoly(unittest.TestCase):
         
         state = json.loads(state_dump)
         # After upward competitor trend, trend signal should be positive
-        self.assertGreater(state['competitor_trend'], 0)
+        self.assertGreater(state['competitor_trend'], 0.1,
+                          f"Expected significantly positive trend, got {state['competitor_trend']}")
         
-        # Now test downward trend
-        downward_trend_prices = [12.0, 11.0, 10.0, 9.0, 8.0]
+        # Now test downward trend with more pronounced changes
+        downward_trend_prices = [12.0, 10.0, 8.0, 6.0, 4.0]
         
         for i, comp_price in enumerate(downward_trend_prices):
             price, state_dump = p(
@@ -172,7 +173,8 @@ class TestDPCDuopoly(unittest.TestCase):
         
         state = json.loads(state_dump)
         # After downward trend, trend signal should be negative
-        self.assertLess(state['competitor_trend'], 0)
+        self.assertLess(state['competitor_trend'], -0.1, 
+                       f"Expected significantly negative trend, got {state['competitor_trend']}")
 
     def test_performance_constraints(self):
         """Test that function meets performance requirements."""
