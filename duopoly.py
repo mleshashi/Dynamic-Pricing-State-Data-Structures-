@@ -48,11 +48,14 @@ def p(current_selling_season, information_dump_last_round=None, **feedback_data)
             state = json.loads(information_dump_last_round)
         except (json.JSONDecodeError, TypeError):
             # Fallback to cold start on corrupted state
-            state = {"season": 0, "competitor_prices": [], "my_prices": [], "demands": [], 
-                    "profit_history": [], "demand_mean": 0.0, "demand_m2": 0.0, "demand_count": 0,
-                    "competitor_mean": 0.0, "competitor_m2": 0.0, "competitor_count": 0,
-                    "base_price": 10.0, "profit_momentum": 0.0, "price_volatility": 1.0,
-                    "competitor_trend": 0.0, "demand_trend": 0.0}
+            state = {
+                "season": 0,
+                "competitor_prices": [], "my_prices": [], "demands": [], "profit_history": [],
+                "demand_mean": 0.0, "demand_m2": 0.0, "demand_count": 0,
+                "competitor_mean": 0.0, "competitor_m2": 0.0, "competitor_count": 0,
+                "base_price": 10.0, "profit_momentum": 0.0, "price_volatility": 1.0,
+                "competitor_trend": 0.0, "demand_trend": 0.0
+            }
     
     # 2. EXTRACT MARKET FEEDBACK
     competitor_price = feedback_data.get('competitor_price', None)
