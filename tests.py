@@ -235,6 +235,5 @@ class TestDPCDuopoly(unittest.TestCase):
         
         print(f"Memory: Early avg={early_avg:.0f} chars, Recent avg={recent_avg:.0f} chars")
 
-
 if __name__ == "__main__":
     unittest.main(verbosity=2)
